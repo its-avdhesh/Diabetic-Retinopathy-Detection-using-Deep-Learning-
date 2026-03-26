@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+myenv/
+
+# OS
+.DS_Store
+
+# Database + coverage
+db.sqlite3
+.coverage
+
+# Models / artifacts
+*.h5
+model/
+model/converted_*/
+diab_retina_app/keras_model.h5
+output/
+
+# Tools
+.pytest_cache/
+*.egg-info/
+
+# Env
+.env
+.env.*
