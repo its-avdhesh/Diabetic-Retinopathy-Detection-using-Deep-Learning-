@@ -1,50 +1,62 @@
-# Diabetic Retinopathy Detection (CNN, Python)
-
-Standalone Python/TensorFlow inference project for classifying diabetic retinopathy from retina images.
+# Diabetic Retinopathy — Django project
+Django project for diabetic retinopathy model inference and related utilities.
 
 ## Overview
-- CNN inference logic: `diab_retina_app/process.py`
-- CLI entrypoint: `predict.py`
-- Expected classes: `No DR`, `Mild`, `Moderate`, `Severe`, `Proliferative`
+- Django app: `diab_retina_app`
+- Project configuration: `diabetic_retinopathy`
+- Contains converted model artifacts under `model/converted_keras` and `model/converted_savedmodel` and a Keras model at `diab_retina_app/keras_model.h5`.
 
 ## Requirements
-- Python 3.8+
-- TensorFlow / Keras
-- NumPy
-- Pillow
+- Python 3.8+ (project currently uses a virtual environment `.venv` / `myenv`).
+- Django (project contains Django files).
+- Keras / TensorFlow for model loading (if you run inference).
 
-## Setup
+## Quick setup
+1. (Optional) Create a virtual environment and activate it:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install tensorflow numpy pillow
 ```
 
-## Run Inference
+2. Install dependencies (if you have `requirements.txt`):
+
 ```bash
-python predict.py --image path/to/retina_image.jpg --model diab_retina_app/keras_model.h5
+pip install -r requirements.txt
 ```
 
-Optional labels file:
+3. Apply migrations and run server:
+
 ```bash
-python predict.py --image path/to/retina_image.jpg --model diab_retina_app/keras_model.h5 --labels model/converted_keras/labels.txt
+python manage.py migrate
+python manage.py runserver
 ```
 
-## Output Format
-The script prints JSON:
-- `predicted_class`: most likely class
-- `confidence`: top-class confidence (%)
-- `probabilities`: class-wise probabilities (%)
-- `preprocessing`: applied preprocessing pipeline
+4. Run tests:
 
-## Paper-Aligned Behavior
-The inference pipeline is aligned with the paper methodology:
-- Retinal boundary-based cropping to remove dark/noisy margins
-- Basic noise reduction (median filtering)
-- Image resizing and normalization before CNN inference
-- 5 DR severity classes: `No DR`, `Mild`, `Moderate`, `Severe`, `Proliferative`
+```bash
+python manage.py test diab_retina_app
+```
 
-## Notes
-- Model files (`*.h5`, SavedModel exports) and generated artifacts should stay out of git.
-- If your model file is not in `diab_retina_app/keras_model.h5`, pass a custom `--model` path.
+## Project structure (high level)
+- `manage.py` — Django entrypoint
+- `diabetic_retinopathy/` — Django project settings and wsgi/asgi
+- `diab_retina_app/` — main app (models, views, process utilities, stored `keras_model.h5`)
+- `model/converted_keras/` — converted keras model and `labels.txt`
+- `model/converted_savedmodel/` — savedmodel export
+- `output/` — generated outputs (ignored)
+- `db.sqlite3` — local sqlite DB (excluded from git)
+
+## Models & large artifacts
+Model files (e.g., `*.h5`, savedmodel folders, `output/`) are large and should not be committed. Use the files under `model/` for inference. If you update/replace models, add them to your deployment storage or dataset release rather than committing to git.
+
+## Usage notes
+- To run inference, inspect `diab_retina_app/process.py` and `diab_retina_app/views.py` for examples of model loading and prediction.
+- Labels for predictions are in `model/converted_keras/labels.txt` (or `model/converted_savedmodel/labels.txt`).
+
+## Contact / Next steps
+- If you want, I can:
+  - add a `requirements.txt` based on the environment,
+  - update `.gitignore` in-place and untrack files,
+  - or create a small script to load and test the model.
 
